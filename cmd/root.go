@@ -5,7 +5,6 @@ import (
 	"os"
 	"github.com/spf13/cobra"
 )
-#ll
 
 var rootCmd = &cobra.Command{  // root command
 	Use:  "veil",
