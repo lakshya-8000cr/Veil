@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	"veil/internals/workspace"
+
 	"github.com/spf13/cobra"
 )
 
-var unmountCmd = &cobra.Command{
-	Use:   "unmount <name>",
-	Short: "Unmount a Veil workspace",
+var destroyCmd = &cobra.Command{
+	Use:   "destroy <name>",
+	Short: "Destroy a Veil workspace",
 	Args:  cobra.ExactArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {
@@ -21,20 +22,19 @@ var unmountCmd = &cobra.Command{
 			return
 		}
 
-		if err := ws.Unmount(); err != nil {
-			fmt.Println(err)
+		if err := ws.Destroy(); err != nil {
+			fmt.Println("failed to destroy workspace:", err)
 			return
 		}
 
 		fmt.Println()
-		fmt.Println("VEIL   Workspace unmounted")
+		fmt.Println("VEIL   Workspace destroyed")
 		fmt.Println()
-		fmt.Println("Name:  ", ws.Name)
-		fmt.Println("Merged:", ws.Merged)
+		fmt.Println("Name:", ws.Name)
 		fmt.Println()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(unmountCmd)
+	rootCmd.AddCommand(destroyCmd)
 }

@@ -99,3 +99,9 @@ func Load(name string) (*Workspace, error) {  // this func will read the path fr
 func (w *Workspace) Unmount() error {
 	return overlay.Unmount(w.Merged)
 }
+
+func (w *Workspace) Destroy() error {
+	_ = w.Unmount()
+
+	return os.RemoveAll(w.Path)
+} // this wil try to unmount first but if already unmounted then delete the directory
