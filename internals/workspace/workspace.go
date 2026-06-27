@@ -66,3 +66,31 @@ func (w *Workspace) Create() error {  // this will create the filepath /veil/wor
 
 	return os.WriteFile(configPath, data, 0644)
 }
+
+func Load(name string) (*Workspace, error) {  // this func will read the path from the config.json then unmarshal it afetr that it wi will create the workspace object 
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	configPath := filepath.Join(
+		home,
+		".veil",
+		"workspaces",
+		name,
+		"config.json",
+	)
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var ws Workspace
+
+	if err := json.Unmarshal(data, &ws); err != nil {
+		return nil, err
+	}
+
+	return &ws, nil
+}
