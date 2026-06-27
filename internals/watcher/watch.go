@@ -1,20 +1,23 @@
 package watcher
 // simple mental model ,
 // linux will create event thru inotify , then go will read those events , print on terminal
+
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
 )
 
 func Watch(path string) error {
-	w, err := fsnotify.NewWatcher()  // we have used the inotify to track the events
+	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return err
 	}
 	defer w.Close()
 
-	if err := w.Add(path); err != nil {
+	if err := addRecursive(w, path); err != nil {
 		return err
 	}
 
@@ -34,6 +37,13 @@ func Watch(path string) error {
 
 			fmt.Println(event.Op, event.Name)
 
+			if event.Has(fsnotify.Create) {
+				info, err := os.Stat(event.Name)
+				if err == nil && info.IsDir() {
+					_ = addRecursive(w, event.Name)
+				}
+			}
+
 		case err, ok := <-w.Errors:
 			if !ok {
 				return nil
@@ -42,4 +52,18 @@ func Watch(path string) error {
 			fmt.Println("watch error:", err)
 		}
 	}
+}
+
+func addRecursive(w *fsnotify.Watcher, root string) error {
+	return filepath.WalkDir(root, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+
+		if entry.IsDir() {
+			return w.Add(path)
+		}
+
+		return nil
+	})
 }
