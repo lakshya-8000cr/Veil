@@ -7,7 +7,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{  // root command
-	use:  "veil",
+	Use:  "veil",
 	Short:  "Disposable development workspaces using OverlayFS",
 }
 
