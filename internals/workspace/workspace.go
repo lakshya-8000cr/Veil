@@ -185,3 +185,8 @@ func FindByProject(project string) (*Workspace, error) { // this will help to de
 
 	return nil, nil
 }
+
+
+func (w *Workspace) IsMounted() bool {
+	return overlay.IsMounted(w.Merged)
+}
