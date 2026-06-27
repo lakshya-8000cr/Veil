@@ -2,9 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"veil/internals/workspace"
 
+	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -22,15 +25,33 @@ var destroyCmd = &cobra.Command{
 			return
 		}
 
-		if err := ws.Destroy(); err != nil {
-			fmt.Println("failed to destroy workspace:", err)
+		fmt.Println()
+		color.New(color.FgWhite, color.Bold).Print("veil")
+		color.New(color.FgHiBlack).Print("  ›  ")
+		color.New(color.FgWhite).Printf("destroying %s\n", name)
+		fmt.Println()
+
+		green := color.New(color.FgGreen).SprintFunc()
+		dim := color.New(color.FgHiBlack).SprintFunc()
+		white := color.New(color.FgWhite).SprintFunc()
+
+		s := spinner.New(spinner.CharSets[14], 80*time.Millisecond)
+		s.Suffix = "  tearing down workspace"
+		s.Start()
+
+		destroyErr := ws.Destroy()
+
+		time.Sleep(2 * time.Second)
+		s.Stop()
+
+		if destroyErr != nil {
+			fmt.Printf("  %s  tearing down workspace\n", color.RedString("✖"))
+			fmt.Println("failed to destroy workspace:", destroyErr)
 			return
 		}
 
-		fmt.Println()
-		fmt.Println("VEIL   Workspace destroyed")
-		fmt.Println()
-		fmt.Println("Name:", ws.Name)
+		fmt.Printf("  %s  workspace destroyed\n", green("✔"))
+		fmt.Printf("  %s  name   %s %s\n", green("✔"), dim("→"), white(ws.Name))
 		fmt.Println()
 	},
 }
