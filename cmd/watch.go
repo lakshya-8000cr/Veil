@@ -5,6 +5,7 @@ import (
 
 	"veil/internals/workspace"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -21,13 +22,27 @@ var watchCmd = &cobra.Command{
 		}
 
 		if !ws.IsMounted() {
-			fmt.Println("workspace is not mounted. Run:")
-			fmt.Println("  veil mount", ws.Name)
+			fmt.Println()
+			color.New(color.FgWhite, color.Bold).Print("veil")
+			color.New(color.FgHiBlack).Print("  ›  ")
+			color.New(color.FgYellow).Println("workspace not mounted")
+			fmt.Println()
+			color.New(color.FgHiBlack).Print("  mount   ")
+			color.New(color.FgCyan).Printf("veil mount %s\n", ws.Name)
+			fmt.Println()
 			return
 		}
 
+		fmt.Println()
+		color.New(color.FgWhite, color.Bold).Print("veil")
+		color.New(color.FgHiBlack).Print("  ›  ")
+		color.New(color.FgWhite).Printf("watching %s\n", ws.Name)
+		fmt.Println()
+		color.New(color.FgHiBlack).Printf("  %s  %s\n", "·", "listening for file changes  ctrl+c to stop")
+		fmt.Println()
+
 		if err := ws.Watch(); err != nil {
-			fmt.Println("watch failed:", err)
+			fmt.Printf("  %s  watch failed: %s\n", color.RedString("✖"), err)
 		}
 	},
 }
