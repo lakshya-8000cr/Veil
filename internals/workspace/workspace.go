@@ -163,3 +163,25 @@ func List() ([]Workspace, error) {  // this will list all the workspaces user ha
 
 	return workspaces, nil
 }
+
+
+
+func FindByProject(project string) (*Workspace, error) { // this will help to detec the duplicate project 
+	absProject, err := filepath.Abs(project)
+	if err != nil {
+		return nil, err
+	}
+
+	workspaces, err := List()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ws := range workspaces {
+		if ws.Project == absProject {
+			return &ws, nil
+		}
+	}
+
+	return nil, nil
+}
