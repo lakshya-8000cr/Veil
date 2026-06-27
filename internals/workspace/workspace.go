@@ -128,3 +128,38 @@ func (w *Workspace) Apply() error {
 		return fs.CopyFile(path, destPath)
 	})
 }
+
+
+func List() ([]Workspace, error) {  // this will list all the workspaces user have created
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	base := filepath.Join(home, ".veil", "workspaces")
+
+	entries, err := os.ReadDir(base)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return []Workspace{}, nil
+		}
+		return nil, err
+	}
+
+	workspaces := []Workspace{}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		ws, err := Load(entry.Name())
+		if err != nil {
+			continue
+		}
+
+		workspaces = append(workspaces, *ws)
+	}
+
+	return workspaces, nil
+}
