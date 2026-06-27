@@ -6,6 +6,7 @@ package workspace
 import (
 	"os"
 	"path/filepath"
+	"veil/internals/overlay"
 		"encoding/json"
 
 )
@@ -93,4 +94,8 @@ func Load(name string) (*Workspace, error) {  // this func will read the path fr
 	}
 
 	return &ws, nil
+}
+
+func (w *Workspace) Unmount() error {
+	return overlay.Unmount(w.Merged)
 }
