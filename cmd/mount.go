@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"veil/internals/overlay"
 	"veil/internals/workspace"
 
+	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -23,20 +26,37 @@ var mountCmd = &cobra.Command{
 			return
 		}
 
-		if err := overlay.Mount(ws.Project, ws.Upper, ws.Work, ws.Merged); err != nil {
-			fmt.Println(err)
+		fmt.Println()
+		color.New(color.FgWhite, color.Bold).Print("veil")
+		color.New(color.FgHiBlack).Print("  ›  ")
+		color.New(color.FgWhite).Printf("mounting %s\n", name)
+		fmt.Println()
+
+		green := color.New(color.FgGreen).SprintFunc()
+		dim := color.New(color.FgHiBlack).SprintFunc()
+		white := color.New(color.FgWhite).SprintFunc()
+		cyan := color.New(color.FgCyan).SprintFunc()
+
+		s := spinner.New(spinner.CharSets[14], 80*time.Millisecond)
+		s.Suffix = "  overlayfs mounting"
+		s.Start()
+
+		mountErr := overlay.Mount(ws.Project, ws.Upper, ws.Work, ws.Merged)
+
+		time.Sleep(1 * time.Second)
+		s.Stop()
+
+		if mountErr != nil {
+			fmt.Printf("  %s  overlayfs mounting\n", color.RedString("✖"))
+			fmt.Println(mountErr)
 			return
 		}
 
+		fmt.Printf("  %s  overlayfs mounted\n", green("✔"))
+		fmt.Printf("  %s  project linked   %s %s\n", green("✔"), dim("→"), white(ws.Project))
+		fmt.Printf("  %s  merged ready     %s %s\n", green("✔"), dim("→"), white(ws.Merged))
 		fmt.Println()
-		fmt.Println("VEIL   Workspace mounted")
-		fmt.Println()
-		fmt.Println("Name:   ", ws.Name)
-		fmt.Println("Project:", ws.Project)
-		fmt.Println("Merged: ", ws.Merged)
-		fmt.Println()
-		fmt.Println("Open:")
-		fmt.Println("  code", ws.Merged)
+		fmt.Printf("  %s    %s\n", dim("open   "), cyan("code "+ws.Merged))
 		fmt.Println()
 	},
 }

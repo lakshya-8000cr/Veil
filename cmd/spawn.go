@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"veil/internals/workspace"
 
+	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -46,14 +49,19 @@ var spawnCmd = &cobra.Command{
 
 		if existing != nil {
 			fmt.Println()
-			fmt.Println("VEIL   Workspace already exists")
+			color.New(color.FgWhite, color.Bold).Print("veil")
+			color.New(color.FgHiBlack).Print("  ›  ")
+			color.New(color.FgYellow).Printf("workspace already exists  %s\n", existing.Name)
 			fmt.Println()
-			fmt.Println("Name:   ", existing.Name)
-			fmt.Println("Project:", existing.Project)
+			color.New(color.FgHiBlack).Print("  name     ")
+			color.New(color.FgWhite).Println(existing.Name)
+			color.New(color.FgHiBlack).Print("  project  ")
+			color.New(color.FgWhite).Println(existing.Project)
 			fmt.Println()
-			fmt.Println("Use:")
-			fmt.Println("  veil mount", existing.Name)
-			fmt.Println("  veil inspect", existing.Name)
+			color.New(color.FgHiBlack).Print("  mount    ")
+			color.New(color.FgCyan).Printf("veil mount %s\n", existing.Name)
+			color.New(color.FgHiBlack).Print("  inspect  ")
+			color.New(color.FgCyan).Printf("veil inspect %s\n", existing.Name)
 			fmt.Println()
 			return
 		}
@@ -64,21 +72,38 @@ var spawnCmd = &cobra.Command{
 			return
 		}
 
-		if err := ws.Create(); err != nil {
-			fmt.Println("failed to initialize workspace:", err)
+		fmt.Println()
+		color.New(color.FgWhite, color.Bold).Print("veil")
+		color.New(color.FgHiBlack).Print("  ›  ")
+		color.New(color.FgWhite).Printf("spawning %s\n", name)
+		fmt.Println()
+
+		green := color.New(color.FgGreen).SprintFunc()
+		dim := color.New(color.FgHiBlack).SprintFunc()
+		white := color.New(color.FgWhite).SprintFunc()
+		cyan := color.New(color.FgCyan).SprintFunc()
+
+		s := spinner.New(spinner.CharSets[14], 80*time.Millisecond)
+		s.Suffix = "  creating workspace"
+		s.Start()
+
+		createErr := ws.Create()
+
+		time.Sleep(2 * time.Second)
+		s.Stop()
+
+		if createErr != nil {
+			fmt.Printf("  %s  creating workspace\n", color.RedString("✖"))
+			fmt.Println("failed to initialize workspace:", createErr)
 			return
 		}
 
+		fmt.Printf("  %s  overlay created\n", green("✔"))
+		fmt.Printf("  %s  project linked   %s %s\n", green("✔"), dim("→"), white(ws.Project))
+		fmt.Printf("  %s  workspace ready  %s %s\n", green("✔"), dim("→"), white(ws.Merged))
 		fmt.Println()
-		fmt.Println("VEIL   Workspace created")
-		fmt.Println()
-		fmt.Println("Name:    ", ws.Name)
-		fmt.Println("Project: ", ws.Project)
-		fmt.Println("Merged:  ", ws.Merged)
-		fmt.Println()
-		fmt.Println("Next:")
-		fmt.Println("  veil mount", ws.Name)
-		fmt.Println("  code", ws.Merged)
+		fmt.Printf("  %s    %s\n", dim("mount  "), cyan("veil mount "+ws.Name))
+		fmt.Printf("  %s  %s\n", dim("inspect"), cyan("veil inspect "+ws.Name))
 		fmt.Println()
 	},
 }
