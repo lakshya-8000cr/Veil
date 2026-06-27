@@ -9,6 +9,7 @@ import (
 	"veil/internals/overlay"
 		"encoding/json"
 		"veil/internals/fs"
+		"veil/internals/watcher"  
 
 )
 
@@ -189,4 +190,9 @@ func FindByProject(project string) (*Workspace, error) { // this will help to de
 
 func (w *Workspace) IsMounted() bool {
 	return overlay.IsMounted(w.Merged)
+}
+
+
+func (w *Workspace) Watch() error {
+	return watcher.Watch(w.Merged)
 }
