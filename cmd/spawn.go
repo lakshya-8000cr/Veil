@@ -9,36 +9,41 @@ import (
 )
   
 var spawnCmd = &cobra.Command{
-	Use:   "spawn <name> <project-path>",
-	Short: "Create a disposable workspace",
-	Args:  cobra.ExactArgs(2),
+Use:   "spawn <name> [project-path]",
+Short: "Create a disposable workspace",
+Args:  cobra.RangeArgs(1, 2),
 
 	Run: func(cmd *cobra.Command, args []string) {
-		name := args[0]
-		projectPath := args[1]
+	name := args[0]
 
-		ws, err := workspace.New(name, projectPath)
-		if err != nil {
-			fmt.Println("failed to create workspace:", err)
-			return
-		}
+	projectPath := "."
+	if len(args) == 2 {
+		projectPath = args[1]
+	}
 
-		if err := ws.Create(); err != nil {
-			fmt.Println("failed to initialize workspace:", err)
-			return
-		}
+	ws, err := workspace.New(name, projectPath)
+	if err != nil {
+		fmt.Println("failed to create workspace:", err)
+		return
+	}
 
-		fmt.Println()
-		fmt.Println("VEIL   Workspace created")
-		fmt.Println()
-		fmt.Println("Name:    ", ws.Name)
-		fmt.Println("Project: ", ws.Project)
-		fmt.Println("Merged:  ", ws.Merged)
-		fmt.Println()
-		fmt.Println("Next:")
-		fmt.Println("  veil mount", ws.Name)
-		fmt.Println()
-	},
+	if err := ws.Create(); err != nil {
+		fmt.Println("failed to initialize workspace:", err)
+		return
+	}
+
+	fmt.Println()
+	fmt.Println("VEIL   Workspace created")
+	fmt.Println()
+	fmt.Println("Name:    ", ws.Name)
+	fmt.Println("Project: ", ws.Project)
+	fmt.Println("Merged:  ", ws.Merged)
+	fmt.Println()
+	fmt.Println("Next:")
+	fmt.Println("  veil mount", ws.Name)
+	fmt.Println("  code", ws.Merged)
+	fmt.Println()
+},
 }
 
 func init() {
