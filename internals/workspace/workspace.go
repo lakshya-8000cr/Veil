@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"veil/internals/overlay"
 		"encoding/json"
+		"veil/internals/fs"
 
 )
 
@@ -105,3 +106,25 @@ func (w *Workspace) Destroy() error {
 
 	return os.RemoveAll(w.Path)
 } // this wil try to unmount first but if already unmounted then delete the directory
+
+
+func (w *Workspace) Apply() error {
+	return filepath.WalkDir(w.Upper, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if entry.IsDir() {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(w.Upper, path)
+		if err != nil {
+			return err
+		}
+
+		destPath := filepath.Join(w.Project, relPath)
+
+		return fs.CopyFile(path, destPath)
+	})
+}
