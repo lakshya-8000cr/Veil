@@ -1,16 +1,18 @@
 package workspace
 
 // here we started mking our first layer which workspace layer
-// this layer will talk to the overlay layer 
+// this layer will talk to the overlay layer
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
-	"veil/internals/overlay"
-		"encoding/json"
-		"veil/internals/fs"
-		"veil/internals/watcher"  
 
+	"veil/internals/fs"
+	"veil/internals/overlay"
+	"veil/internals/watcher"
 )
 
 type Workspace struct {
@@ -45,12 +47,12 @@ func New(name string, project string) (*Workspace, error) { //  this will create
 	}, nil
 }
 
-func (w *Workspace) Create() error {  // this will create the filepath /veil/workspace/project-name/ upper  ./work  ./merged  ./config.json
+func (w *Workspace) Create() error { // this will create the filepath /veil/workspace/project-name/ upper  ./work  ./merged  ./config.json
 	if err := os.MkdirAll(w.Upper, 0755); err != nil {
 		return err
 	}
 
-	// config.json will contain the meta data of the project , maimly name and the path  
+	// config.json will contain the meta data of the project , maimly name and the path
 
 	if err := os.MkdirAll(w.Work, 0755); err != nil {
 		return err
@@ -70,7 +72,7 @@ func (w *Workspace) Create() error {  // this will create the filepath /veil/wor
 	return os.WriteFile(configPath, data, 0644)
 }
 
-func Load(name string) (*Workspace, error) {  // this func will read the path from the config.json then unmarshal it afetr that it wi will create the workspace object 
+func Load(name string) (*Workspace, error) { // this func will read the path from the config.json then unmarshal it afetr that it wi will create the workspace object
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -103,11 +105,19 @@ func (w *Workspace) Unmount() error {
 }
 
 func (w *Workspace) Destroy() error {
-	_ = w.Unmount()
+	if err := w.Unmount(); err != nil {
+		fmt.Println("warning: workspace may already be unmounted")
+	}
 
-	return os.RemoveAll(w.Path)
+	cmd := exec.Command("sudo", "rm", "-rf", w.Path)
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to remove workspace: %v: %s", err, string(out))
+	}
+
+	return nil
 } // this wil try to unmount first but if already unmounted then delete the directory
-
 
 func (w *Workspace) Apply() error {
 	return filepath.WalkDir(w.Upper, func(path string, entry os.DirEntry, err error) error {
@@ -118,6 +128,15 @@ func (w *Workspace) Apply() error {
 		if entry.IsDir() {
 			return nil
 		}
+
+		info, err := entry.Info()
+		if err != nil {
+			return nil
+		}
+
+		if !info.Mode().IsRegular() {
+			return nil
+		} // thi
 
 		relPath, err := filepath.Rel(w.Upper, path)
 		if err != nil {
@@ -130,8 +149,7 @@ func (w *Workspace) Apply() error {
 	})
 }
 
-
-func List() ([]Workspace, error) {  // this will list all the workspaces user have created
+func List() ([]Workspace, error) { // this will list all the workspaces user have created
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -165,9 +183,7 @@ func List() ([]Workspace, error) {  // this will list all the workspaces user ha
 	return workspaces, nil
 }
 
-
-
-func FindByProject(project string) (*Workspace, error) { // this will help to detec the duplicate project 
+func FindByProject(project string) (*Workspace, error) { // this will help to detec the duplicate project
 	absProject, err := filepath.Abs(project)
 	if err != nil {
 		return nil, err
@@ -187,11 +203,9 @@ func FindByProject(project string) (*Workspace, error) { // this will help to de
 	return nil, nil
 }
 
-
 func (w *Workspace) IsMounted() bool {
 	return overlay.IsMounted(w.Merged)
 }
-
 
 func (w *Workspace) Watch() error {
 	return watcher.Watch(w.Merged)
