@@ -4,7 +4,60 @@
 
 Veil is a Linux-native command-line tool that orchestrates **OverlayFS**, **copy-on-write filesystem semantics**, and **inotify-based filesystem observation** to provision isolated development workspaces. Instead of replicating project directories, Veil composes a writable workspace by mounting an immutable project directory as the lower layer and redirecting runtime modifications into an isolated writable layer.
 
-The project serves as a practical implementation of Linux filesystem primitives while demonstrating production-style service architecture, filesystem orchestration, and event-driven monitoring ,This approach minimizes disk utilization, preserves the integrity of the original project, and demonstrates practical usage of Linux filesystem primitives.
+The project serves as a practical implementation of Linux filesystem primitives while demonstrating production-style service architecture, filesystem orchestration, and event-driven monitoring. This approach minimizes disk utilization, preserves the integrity of the original project, and demonstrates practical usage of Linux filesystem primitives.
+
+---
+
+# Installation
+
+
+Install Veil:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lakshya-8000cr/veil/main/install.sh | bash
+```
+
+<a href="https://asciinema.org/a/1259398" target="_blank"><img src="https://asciinema.org/a/1259398.svg" /></a>
+
+
+Navigate to the project you want to isolate.
+
+```bash
+cd ~/projects/my-project
+```
+
+Create a workspace.
+
+```bash
+veil spawn
+```
+
+Mount the workspace.
+
+```bash
+veil mount my-project
+```
+
+Open the merged workspace.
+
+```bash
+code ~/.veil/workspaces/my-project/merged
+```
+
+---
+
+# Commands
+
+```bash
+veil spawn
+veil mount <workspace>
+veil unmount <workspace>
+veil apply <workspace>
+veil destroy <workspace>
+veil inspect <workspace>
+veil list
+veil watch <workspace>
+```
 
 ---
 
@@ -171,55 +224,6 @@ Metadata Initialization + OverlayFS Mount
 
 ---
 
-# Installation
-
-Install Veil:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/lakshya-8000cr/veil/main/install.sh | bash
-```
-
-Navigate to the project you want to isolate.
-
-```bash
-cd ~/projects/my-project
-```
-
-Create a workspace.
-
-```bash
-veil spawn
-```
-
-Mount the workspace.
-
-```bash
-veil mount my-project
-```
-
-Open the merged workspace.
-
-```bash
-code ~/.veil/workspaces/my-project/merged
-```
-
----
-
-# Commands
-
-```bash
-veil spawn
-veil mount <workspace>
-veil unmount <workspace>
-veil apply <workspace>
-veil destroy <workspace>
-veil inspect <workspace>
-veil list
-veil watch <workspace>
-```
-
----
-
 # Linux Technologies
 
 * OverlayFS
@@ -231,7 +235,7 @@ veil watch <workspace>
 * Streaming File I/O
 * Go
 * Cobra CLI
-* 
+
 ---
 
 # License
