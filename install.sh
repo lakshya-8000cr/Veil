@@ -8,7 +8,7 @@ echo " VEIL Installer"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-URL="https://github.com/lakshya-8000cr/Veil/releases/download/v1.0.0/Veil"
+URL="https://github.com/lakshya-8000cr/Veil/releases/download/v1.0.1/Veil"
 
 echo "Downloading Veil..."
 sudo curl -fsSL "$URL" -o /usr/local/bin/veil
