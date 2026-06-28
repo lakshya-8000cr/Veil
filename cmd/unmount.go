@@ -2,11 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"time"
 
 	"veil/internals/workspace"
 
-	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -35,18 +33,9 @@ var unmountCmd = &cobra.Command{
 		dim := color.New(color.FgHiBlack).SprintFunc()
 		white := color.New(color.FgWhite).SprintFunc()
 
-		s := spinner.New(spinner.CharSets[14], 80*time.Millisecond)
-		s.Suffix = "  detaching overlayfs"
-		s.Start()
-
-		unmountErr := ws.Unmount()
-
-		time.Sleep(2 * time.Second)
-		s.Stop()
-
-		if unmountErr != nil {
+		if err := ws.Unmount(); err != nil {
 			fmt.Printf("  %s  detaching overlayfs\n", color.RedString("✖"))
-			fmt.Println(unmountErr)
+			fmt.Println(err)
 			return
 		}
 

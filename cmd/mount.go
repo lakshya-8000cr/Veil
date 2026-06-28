@@ -2,12 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"time"
 
 	"veil/internals/overlay"
 	"veil/internals/workspace"
 
-	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -37,18 +35,9 @@ var mountCmd = &cobra.Command{
 		white := color.New(color.FgWhite).SprintFunc()
 		cyan := color.New(color.FgCyan).SprintFunc()
 
-		s := spinner.New(spinner.CharSets[14], 80*time.Millisecond)
-		s.Suffix = "  overlayfs mounting"
-		s.Start()
-
-		mountErr := overlay.Mount(ws.Project, ws.Upper, ws.Work, ws.Merged)
-
-		time.Sleep(1 * time.Second)
-		s.Stop()
-
-		if mountErr != nil {
+		if err := overlay.Mount(ws.Project, ws.Upper, ws.Work, ws.Merged); err != nil {
 			fmt.Printf("  %s  overlayfs mounting\n", color.RedString("✖"))
-			fmt.Println(mountErr)
+			fmt.Println(err)
 			return
 		}
 

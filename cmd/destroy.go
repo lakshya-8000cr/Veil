@@ -2,11 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"time"
 
 	"veil/internals/workspace"
 
-	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -35,18 +33,9 @@ var destroyCmd = &cobra.Command{
 		dim := color.New(color.FgHiBlack).SprintFunc()
 		white := color.New(color.FgWhite).SprintFunc()
 
-		s := spinner.New(spinner.CharSets[14], 80*time.Millisecond)
-		s.Suffix = "  tearing down workspace"
-		s.Start()
-
-		destroyErr := ws.Destroy()
-
-		time.Sleep(2 * time.Second)
-		s.Stop()
-
-		if destroyErr != nil {
+		if err := ws.Destroy(); err != nil {
 			fmt.Printf("  %s  tearing down workspace\n", color.RedString("✖"))
-			fmt.Println("failed to destroy workspace:", destroyErr)
+			fmt.Println("failed to destroy workspace:", err)
 			return
 		}
 
