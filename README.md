@@ -17,7 +17,7 @@ Install Veil:
 curl -fsSL https://raw.githubusercontent.com/lakshya-8000cr/veil/main/install.sh | bash
 ```
 
-<a href="https://asciinema.org/a/1259398" target="_blank"><img src="https://asciinema.org/a/1259398.svg" /></a>
+<a href="https://asciinema.org/a/1259398" target="_blank"><img src="https://asciinema.org/a/1259398.svg" height="600" /></a>
 
 
 Navigate to the project you want to isolate.
