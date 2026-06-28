@@ -231,17 +231,7 @@ veil watch <workspace>
 * Streaming File I/O
 * Go
 * Cobra CLI
-
----
-
-# Future Roadmap
-
-* Snapshot-based workspace restoration
-* Incremental workspace synchronization
-* Enhanced OverlayFS inspection utilities
-* Extended workspace automation
-* Additional filesystem backends
-
+* 
 ---
 
 # License
